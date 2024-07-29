@@ -1,4 +1,9 @@
 import numpy as np
+# importing module
+import sys
+ 
+# appending a path
+sys.path.append('ccma')
 from ccma import CCMA
 import matplotlib.pyplot as plt
 

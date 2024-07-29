@@ -15,6 +15,11 @@ Steps:
 
 import matplotlib.pyplot as plt
 import numpy as np
+# importing module
+import sys
+ 
+# appending a path
+sys.path.append('ccma')
 from ccma import CCMA
 import random
 

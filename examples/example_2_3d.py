@@ -1,6 +1,11 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
+# importing module
+import sys
+ 
+# appending a path
+sys.path.append('ccma')
 from ccma import CCMA
 
 # Create a noisy 2d-path
