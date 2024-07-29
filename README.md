@@ -2,7 +2,7 @@
 
 <div  markdown="1" align="center">
 
-  `❞The allure of methods guided solely by data.❞—ChatGPT`
+  `❞Oh my gosh, look at her butt. Oh my gosh, look at her butt❞— N. Minaj`
 
 </div>
 
