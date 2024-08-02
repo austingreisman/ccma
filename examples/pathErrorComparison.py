@@ -8,6 +8,9 @@ import sys
 sys.path.append('ccma')
 from ccma import CCMA
 
+# Constant Seed
+np.random.seed(42)
+
 def generate_shapes(n, noise_sigma):
     t = np.linspace(0, 1, n)
     
@@ -46,61 +49,49 @@ def calculate_perpendicular_error(true_path, predicted_path):
             break
         
         # Get two consecutive points on the true path
-        p1, p2 = true_path[i], true_path[i+1]
-        
-        # Calculate the vector of the true path segment
-        v = p2 - p1
-        
-        # Normalize the vector
-        v_norm = v / np.linalg.norm(v)
-        
-        # Calculate the perpendicular vector
-        v_perp = np.array([-v_norm[1], v_norm[0]])
-        
-        # Calculate the perpendicular distance
-        d = np.abs(np.dot(predicted_path[i - start_idx] - p1, v_perp))
-        
-        errors.append(d)
+        if len(true_path) - 1 > i:
+            p1, p2 = true_path[i], true_path[i+1]
+            
+            # Calculate the vector of the true path segment
+            v = p2 - p1
+            
+            # Normalize the vector
+            v_norm = v / np.linalg.norm(v)
+            
+            # Calculate the perpendicular vector
+            v_perp = np.array([-v_norm[1], v_norm[0]])
+            
+            # Calculate the perpendicular distance
+            d = np.abs(np.dot(predicted_path[i - start_idx] - p1, v_perp))
+            
+            errors.append(d)
     
     return np.mean(errors)
 
 # Create a noisy 2d-path
 n = 100
 sigma = 0.02
+# After generating shapes and defining CCMA parameters
 shapes = generate_shapes(n, sigma)
+w_ma_values = [2, 4, 6]
+w_cc_values = [1, 2, 3]
 
-# Now you can access each shape like this:
-right_angle_true = shapes["right_angle"]["true"]
-right_angle_noisy = shapes["right_angle"]["noisy"]
-
-# Create the CCMA-filter object
-w_ma = 4
-w_cc = 2
-ccma = CCMA(w_ma, w_cc, distrib="hanning")
-
-
-# Filter points with and w/o boundaries
-ccma_points = ccma.filter(right_angle_noisy, mode="none")
-# ccma_points_wo_padding = ccma.filter(points_errors, mode="none")
-# ma_points = ccma.filter(points_errors, cc_mode=False)
-
-# Visualize results
-plt.plot(*right_angle_true.T, "r-o", linewidth=4, alpha=0.3, color='yellow', markersize=10, label="original TRUE")
-plt.plot(*right_angle_noisy.T, "r-o", linewidth=3, alpha=0.3, color='red', markersize=10, label="original Noise")
-plt.plot(*ccma_points.T, linewidth=6, alpha=1.0, color="orange", label=f"ccma-smoothed ({w_ma}, {w_cc})")
-# plt.plot(*ccma_points_wo_padding.T, linewidth=3, alpha=0.5, color="b", label=f"ccma-smoothed ({w_ma}, {w_cc})")
-# plt.plot(*ma_points.T, linewidth=2, alpha=0.5, color="green", label=f"ma-smoothed ({w_ma})")
-average_error = calculate_perpendicular_error(right_angle_true, ccma_points)
-
-print(f"Average error between true path and CCMA path: {average_error:.6f}")
-# General settings
-plt.grid(True)
-plt.gca().set_aspect('equal')
-plt.legend()
-plt.tight_layout()
-plt.gcf().set_size_inches(12, 6)
-plt.xlabel("x")
-plt.ylabel("y")
-plt.title("CCMA - Example 1 (2d)")
-
-plt.show()
+for shape_name, shape_data in shapes.items():
+    true_path = shape_data["true"]
+    noisy_path = shape_data["noisy"]
+    
+    print(f"\nProcessing shape: {shape_name}")
+    
+    # Calculate baseline error (without CCMA)
+    baseline_error = calculate_perpendicular_error(true_path, noisy_path)
+    print(f"Baseline error (no CCMA): {baseline_error:.6f}")
+    
+    for w_ma in w_ma_values:
+        for w_cc in w_cc_values:
+            ccma = CCMA(w_ma, w_cc, distrib="hanning")
+            ccma_points = ccma.filter(noisy_path, mode="none")
+            
+            ccma_error = calculate_perpendicular_error(true_path, ccma_points)
+            error_improvement = (baseline_error - ccma_error) / baseline_error * 100
+            
+            print(f"CCMA (w_ma={w_ma}, w_cc={w_cc}) - Error: {ccma_error:.6f}, Improvement: {error_improvement:.2f}%")
