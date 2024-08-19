@@ -8,6 +8,9 @@ import sys
 sys.path.append('ccma')
 from ccma import CCMA
 
+# Constant Seed
+np.random.seed(42)
+
 def generate_shapes(n, noise_sigma):
     t = np.linspace(0, 1, n)
     
@@ -79,12 +82,12 @@ sigma = 0.015
 shapes = generate_shapes(n, sigma)
 
 # Now you can access each shape like this:
-right_angle_true = shapes["spiral"]["true"]
-right_angle_noisy = shapes["spiral"]["noisy"]
+right_angle_true = shapes["right_angle"]["true"]
+right_angle_noisy = shapes["right_angle"]["noisy"]
 
 # Create the CCMA-filter object
-w_ma = 6
-w_cc = 3
+w_ma = 7
+w_cc = 4
 ccma = CCMA(w_ma, w_cc, distrib="hanning")
 
 
@@ -94,9 +97,10 @@ ccma_points = ccma.filter(right_angle_noisy, mode="none")
 # ma_points = ccma.filter(points_errors, cc_mode=False)
 
 # Visualize results
-plt.plot(*right_angle_true.T, "r-o", linewidth=4, alpha=0.3, color='yellow', markersize=10, label="original TRUE")
-plt.plot(*right_angle_noisy.T, "r-o", linewidth=3, alpha=0.3, color='red', markersize=10, label="original Noise")
-plt.plot(*ccma_points.T, linewidth=6, alpha=1.0, color="orange", label=f"ccma-smoothed ({w_ma}, {w_cc})")
+plt.plot(*right_angle_true.T, "y-o", linewidth=4, alpha=0.3, markersize=10, label="original TRUE")
+plt.plot(*right_angle_noisy.T, "r-o", linewidth=3, alpha=0.3, markersize=10, label="original Noise")
+# plt.plot(*ccma_points.T, linewidth=6, alpha=1.0, color="orange", label=f"ccma-smoothed ({w_ma}, {w_cc})")
+plt.plot(*ccma_points.T, "b-o", linewidth=6, alpha=1.0,  markersize=10, label=f"ccma-smoothed ({w_ma}, {w_cc})")
 # plt.plot(*ccma_points_wo_padding.T, linewidth=3, alpha=0.5, color="b", label=f"ccma-smoothed ({w_ma}, {w_cc})")
 # plt.plot(*ma_points.T, linewidth=2, alpha=0.5, color="green", label=f"ma-smoothed ({w_ma})")
 average_error = calculate_perpendicular_error(right_angle_true, ccma_points)

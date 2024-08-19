@@ -86,7 +86,7 @@ def get_unit_vector(vec):
 
 
 class CCMA:
-    def __init__(self, w_ma=5, w_cc=3, distrib="pascal", distrib_ma=None, distrib_cc=None, rho_ma=0.95, rho_cc=0.95):
+    def __init__(self, w_ma=5, w_cc=3, distrib="hanning", distrib_ma=None, distrib_cc=None, rho_ma=0.95, rho_cc=0.95):
         """
         Initialize the SmoothingFilter object with specified parameters.
 
@@ -265,7 +265,7 @@ class CCMA:
 
             # TODO :: Maybe add a warning if the threshold gets active.
             # Apply threshold to MA-estimated radius to avoid unstable correction (-> limited correction)(see paper)
-            radii_ma[idx] = max(0.35, radii_ma[idx])
+            radii_ma[idx] = max(0.0, radii_ma[idx])
 
         return radii_ma
 
