@@ -362,7 +362,9 @@ class CCMA:
             raise RuntimeError("At least 3 points are necessary for the CCMA-filtering")
 
         if mode == "padding":
-            n_padding = self.w_ccma if cc_mode else self.w_ma
+            # fullWeight = (self.w_ccma - 1) * 2 + 1
+            fullWeight = self.w_ccma
+            n_padding = fullWeight if cc_mode else self.w_ma
             points = np.row_stack((np.tile(points[0], (n_padding, 1)),
                                    points,
                                    np.tile(points[-1], (n_padding, 1))))
